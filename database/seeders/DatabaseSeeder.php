@@ -14,7 +14,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ActivityTypeSeeder::class,
             ActivitySeeder::class,
-            ScheduleSeeder::class,
             LogSeeder::class,
         ]);
     }

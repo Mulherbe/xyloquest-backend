@@ -19,6 +19,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // Resources
     Route::apiResource('/activities', ActivityController::class);
     Route::apiResource('/activity-types', ActivityTypeController::class);
-    Route::apiResource('/schedules', ScheduleController::class);
     Route::apiResource('/logs', LogController::class);
 });

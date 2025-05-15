@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Activity extends Model
 {
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_DONE    = 'done';
+    public const STATUS_SKIPPED = 'skipped';
+
     protected $fillable = [
         'user_id',
         'activity_type_id',
@@ -14,12 +18,16 @@ class Activity extends Model
         'start_date',
         'end_date',
         'is_recurring',
+        'recurrence_rule',
+        'completed_at',
+        'status', 
     ];
 
     protected $casts = [
-        'is_recurring' => 'boolean',
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
+        'is_recurring'  => 'boolean',
+        'start_date'    => 'datetime',
+        'end_date'      => 'datetime',
+        'completed_at'  => 'datetime',
     ];
 
     public function user()
@@ -27,18 +35,25 @@ class Activity extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function type()
+    public function activityType()
     {
         return $this->belongsTo(ActivityType::class, 'activity_type_id');
-    }
-
-    public function schedule()
-    {
-        return $this->hasOne(Schedule::class);
     }
 
     public function logs()
     {
         return $this->hasMany(Log::class);
+    }
+    public function isDone(): bool
+    {
+        return $this->status === self::STATUS_DONE;
+    }
+        public function isPending(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+    public function isSkipped(): bool
+    {
+        return $this->status === self::STATUS_SKIPPED;
     }
 }

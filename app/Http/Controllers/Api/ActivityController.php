@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -12,30 +13,46 @@ class ActivityController extends Controller
     public function index()
     {
         return ActivityResource::collection(
-            Activity::with(['type', 'user'])->get()
+            Activity::with(['activityType', 'user'])->get()
         );
     }
 
-    public function store(StoreActivityRequest $request)
+   public function store(StoreActivityRequest $request)
     {
-        $activity = Activity::create($request->validated());
-        return new ActivityResource($activity->load(['type', 'user']));
+        $data = $request->validated();
+
+        if (!isset($data['status'])) {
+            $data['status'] = 'pending';
+        }
+
+        $activity = Activity::create($data);
+
+        return new ActivityResource(
+            $activity->load(['activityType', 'user'])
+        );
     }
+
 
     public function show(Activity $activity)
     {
-        return new ActivityResource($activity->load(['type', 'user']));
+        return new ActivityResource(
+            $activity->load(['activityType', 'user'])
+        );
     }
 
     public function update(UpdateActivityRequest $request, Activity $activity)
     {
         $activity->update($request->validated());
-        return new ActivityResource($activity->load(['type', 'user']));
+
+        return new ActivityResource(
+            $activity->load(['activityType', 'user'])
+        );
     }
 
     public function destroy(Activity $activity)
     {
         $activity->delete();
+
         return response()->noContent();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
@@ -15,7 +16,9 @@ class ActivityResource extends JsonResource
             'start_date'      => $this->start_date?->toDateTimeString(),
             'end_date'        => $this->end_date?->toDateTimeString(),
             'is_recurring'    => $this->is_recurring,
-            'activity_type'   => new ActivityTypeResource($this->whenLoaded('type')),
+            'recurrence_rule' => $this->recurrence_rule,
+            'completed_at'    => $this->completed_at?->toDateTimeString(),
+            'activity_type'   => new ActivityTypeResource($this->whenLoaded('activityType')),
             'user'            => [
                 'id'    => $this->user->id,
                 'name'  => $this->user->name,
