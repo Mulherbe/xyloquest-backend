@@ -17,6 +17,7 @@ class ActivityResource extends JsonResource
             'end_date'        => $this->end_date?->toDateTimeString(),
             'is_recurring'    => $this->is_recurring,
             'recurrence_rule' => $this->recurrence_rule,
+            'status'          => $this->status, 
             'completed_at'    => $this->completed_at?->toDateTimeString(),
             'activity_type'   => new ActivityTypeResource($this->whenLoaded('activityType')),
             'user'            => [

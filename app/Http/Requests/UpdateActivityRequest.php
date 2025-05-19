@@ -13,14 +13,14 @@ class UpdateActivityRequest extends FormRequest
   public function rules(): array
 {
     return [
-        'title'            => ['required', 'string', 'max:255'],
+        'title'            => ['nullable','string', 'max:255'],
         'description'      => ['nullable', 'string'],
-        'start_date'       => ['required', 'date'],
+        'start_date'       => ['nullable','date'],
         'end_date'         => ['nullable', 'date', 'after_or_equal:start_date'],
-        'is_recurring'     => ['required', 'boolean'],
+        'is_recurring'     => ['nullable', 'boolean'],
         'recurrence_rule'  => ['nullable', 'string', 'in:daily,weekly,every_3_days'],
         'completed_at'     => ['nullable', 'date'],
-        'activity_type_id' => ['required', 'exists:activity_types,id'],
+        'activity_type_id' => ['nullable', 'exists:activity_types,id'],
         'status'           => ['nullable', 'string', 'in:pending,done,skipped'],
     ];
 }
