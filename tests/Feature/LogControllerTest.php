@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class LogControllerTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_authenticated_user_can_list_logs()
     {

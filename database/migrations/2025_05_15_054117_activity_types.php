@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('color')->nullable(); // ex: #ff00ff
+            $table->integer('default_points_per_hour')->default(0);
             $table->timestamps();
         });
     }

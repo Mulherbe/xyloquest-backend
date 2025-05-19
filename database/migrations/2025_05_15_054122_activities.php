@@ -26,6 +26,7 @@ return new class extends Migration {
             // Si activité cochée comme "faite"
             $table->timestamp('completed_at')->nullable();
             $table->string('status')->default('pending'); // valeurs : pending, done, skipped
+            $table->integer('earned_points')->default(0);
 
             $table->timestamps();
         });

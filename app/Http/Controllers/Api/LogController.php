@@ -2,8 +2,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreLogRequest;
-use App\Http\Requests\UpdateLogRequest;
+use App\Http\Requests\Log\StoreLogRequest;
+use App\Http\Requests\Log\UpdateLogRequest;
 use App\Http\Resources\LogResource;
 use App\Models\Log;
 

@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Activity extends Model
 {
+    use HasFactory;
+
     public const STATUS_PENDING = 'pending';
     public const STATUS_DONE    = 'done';
     public const STATUS_SKIPPED = 'skipped';
@@ -21,6 +24,7 @@ class Activity extends Model
         'recurrence_rule',
         'completed_at',
         'status', 
+        'earned_points'
     ];
 
     protected $casts = [

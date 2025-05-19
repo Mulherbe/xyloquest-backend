@@ -2,30 +2,34 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ActivityResource extends JsonResource
 {
-    public function toArray(Request $request): array
+    public function toArray($request): array
     {
         return [
-            'id'              => $this->id,
-            'title'           => $this->title,
-            'description'     => $this->description,
-            'start_date'      => $this->start_date?->toDateTimeString(),
-            'end_date'        => $this->end_date?->toDateTimeString(),
-            'is_recurring'    => $this->is_recurring,
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'user_id' => $this->user_id,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+            'is_recurring' => $this->is_recurring,
             'recurrence_rule' => $this->recurrence_rule,
-            'status'          => $this->status, 
-            'completed_at'    => $this->completed_at?->toDateTimeString(),
-            'activity_type'   => new ActivityTypeResource($this->whenLoaded('activityType')),
+            'completed_at' => $this->completed_at,
+            'activity_type_id' => $this->activity_type_id,
+            'status' => $this->status,
+            'earned_points' => $this->earned_points, // ✅ AJOUT ICI
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+
+            // Relations
+            'activity_type' => new ActivityTypeResource($this->whenLoaded('activityType')),
             'user'            => [
                 'id'    => $this->user->id,
                 'name'  => $this->user->name,
                 'email' => $this->user->email,
-            ],
-            'created_at'      => $this->created_at->toDateTimeString(),
-        ];
+            ],        ];
     }
 }
