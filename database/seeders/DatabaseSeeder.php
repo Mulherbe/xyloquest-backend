@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             ActivityTypeSeeder::class,
             ActivitySeeder::class,
             LogSeeder::class,
+            MonthlyGoalSeeder::class,
         ]);
     }
 

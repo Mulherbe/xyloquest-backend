@@ -5,9 +5,9 @@ namespace Tests\Feature;
 use App\Models\Activity;
 use App\Models\ActivityType;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Carbon\Carbon;
 
 class ActivityControllerTest extends TestCase
 {
@@ -21,11 +21,17 @@ class ActivityControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
-        $this->token = $this->user->createToken('test')->plainTextToken;
-        $this->type = ActivityType::factory()->create([
+        /** @var User $user */
+        $user = User::factory()->create();
+
+        /** @var ActivityType $type */
+        $type = ActivityType::factory()->create([
             'default_points_per_hour' => 4,
         ]);
+
+        $this->user = $user;
+        $this->token = $user->createToken('test')->plainTextToken;
+        $this->type = $type;
     }
 
     protected function authHeaders(): array
@@ -33,7 +39,7 @@ class ActivityControllerTest extends TestCase
         return ['Authorization' => "Bearer {$this->token}"];
     }
 
-    public function test_can_list_activities()
+    public function test_can_list_activities(): void
     {
         Activity::factory()->create([
             'user_id' => $this->user->id,
@@ -47,8 +53,9 @@ class ActivityControllerTest extends TestCase
                  ->assertJsonStructure(['data']);
     }
 
-    public function test_can_create_activity_and_calculate_points()
+    public function test_can_create_activity_and_calculate_points(): void
     {
+        /** @var Carbon $start */
         $start = Carbon::now();
         $end = (clone $start)->addHour();
 
@@ -71,8 +78,9 @@ class ActivityControllerTest extends TestCase
                  ->assertJsonPath('data.earned_points', 4);
     }
 
-    public function test_can_show_activity()
+    public function test_can_show_activity(): void
     {
+        /** @var Activity $activity */
         $activity = Activity::factory()->create([
             'user_id' => $this->user->id,
             'activity_type_id' => $this->type->id,
@@ -85,9 +93,12 @@ class ActivityControllerTest extends TestCase
                  ->assertJsonPath('data.id', $activity->id);
     }
 
-    public function test_can_update_activity_and_recalculate_points()
+    public function test_can_update_activity_and_recalculate_points(): void
     {
+        /** @var Carbon $start */
         $start = Carbon::now();
+
+        /** @var Activity $activity */
         $activity = Activity::factory()->create([
             'user_id' => $this->user->id,
             'activity_type_id' => $this->type->id,
@@ -106,9 +117,12 @@ class ActivityControllerTest extends TestCase
                  ->assertJsonPath('data.earned_points', 8);
     }
 
-    public function test_can_delete_activity_and_return_updated_monthly_points()
+    public function test_can_delete_activity_and_return_updated_monthly_points(): void
     {
+        /** @var Carbon $start */
         $start = Carbon::now();
+
+        /** @var Activity $activity */
         $activity = Activity::factory()->create([
             'user_id' => $this->user->id,
             'activity_type_id' => $this->type->id,

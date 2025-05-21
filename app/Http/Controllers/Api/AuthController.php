@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -14,9 +15,9 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (!Auth::attempt($credentials)) {
+        if (! Auth::attempt($credentials)) {
             return response()->json([
-                'message' => 'Identifiants invalides'
+                'message' => 'Identifiants invalides',
             ], 401);
         }
 
@@ -40,7 +41,7 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json([
-            'message' => 'Déconnecté avec succès'
+            'message' => 'Déconnecté avec succès',
         ]);
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Process\Process;
 
 class CodeCheck extends Command
 {
@@ -11,36 +10,37 @@ class CodeCheck extends Command
     protected $description = 'Run PHP Insights, PHPStan, and PHPUnit';
 
     public function handle(): int
-{
-    $this->titleBlock('PHP Insights');
-    $this->runProcess(['php', 'vendor/bin/phpinsights', '--no-interaction', '--format=console']);
+    {
+        $this->titleBlock('Generating model docblocks...');
+        $this->runProcess(['php', 'artisan', 'ide-helper:models', '--write']);
 
-    $this->titleBlock('PHPStan');
-    $this->runProcess(['php', 'vendor/bin/phpstan', 'analyse', '--no-interaction']);
+        $this->titleBlock('PHP Insights');
+        $this->runProcess(['php', 'vendor/bin/phpinsights', '--no-interaction', '--format=console']);
 
-    $this->titleBlock('PHPUnit');
-    $this->runProcess(['php', 'artisan', 'test']);
+        $this->titleBlock('PHPStan');
+        $this->runProcess(['php', 'vendor/bin/phpstan', 'analyse', '--configuration=phpstan.neon']);
 
-    $this->info("\n🎉 Tous les contrôles sont terminés avec succès.");
-    return Command::SUCCESS;
-}
+        $this->titleBlock('PHPUnit');
+        $this->runProcess(['php', 'artisan', 'test']);
 
-private function runProcess(array $command): void
-{
-    $process = new \Symfony\Component\Process\Process($command);
-    $process->run(function ($type, $buffer) {
-        echo $buffer;
-    });
-}
+        $this->info("\n🎉 Tous les contrôles sont terminés avec succès.");
+        return Command::SUCCESS;
+    }
 
-private function titleBlock(string $title): void
-{
-    $bar = str_repeat('─', strlen($title) + 4);
-    $this->newLine();
-    $this->line("┌{$bar}┐");
-    $this->line("│  {$title}  │");
-    $this->line("└{$bar}┘");
-}
+    private function runProcess(array $command): void
+    {
+        $process = new \Symfony\Component\Process\Process($command);
+        $process->run(function ($type, $buffer) {
+            echo $buffer;
+        });
+    }
 
-
+    private function titleBlock(string $title): void
+    {
+        $bar = str_repeat('─', strlen($title) + 4);
+        $this->newLine();
+        $this->line("┌{$bar}┐");
+        $this->line("│  {$title}  │");
+        $this->line("└{$bar}┘");
+    }
 }

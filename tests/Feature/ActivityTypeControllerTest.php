@@ -4,10 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\ActivityType;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ActivityTypeControllerTest extends TestCase
 {
+    use RefreshDatabase;
 
     protected User $user;
     protected string $token;
@@ -16,8 +18,11 @@ class ActivityTypeControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
-        $this->token = $this->user->createToken('test')->plainTextToken;
+        /** @var User $user */
+        $user = User::factory()->create();
+
+        $this->user = $user;
+        $this->token = $user->createToken('test')->plainTextToken;
     }
 
     protected function authHeaders(): array
@@ -25,7 +30,7 @@ class ActivityTypeControllerTest extends TestCase
         return ['Authorization' => "Bearer {$this->token}"];
     }
 
-    public function test_authenticated_user_can_list_activity_types()
+    public function test_authenticated_user_can_list_activity_types(): void
     {
         ActivityType::factory()->count(2)->create();
 
@@ -36,7 +41,7 @@ class ActivityTypeControllerTest extends TestCase
                  ->assertJsonStructure(['data']);
     }
 
-    public function test_authenticated_user_can_create_activity_type()
+    public function test_authenticated_user_can_create_activity_type(): void
     {
         $payload = [
             'name' => 'Travail',
@@ -52,8 +57,9 @@ class ActivityTypeControllerTest extends TestCase
                  ->assertJsonPath('data.default_points_per_hour', 4);
     }
 
-    public function test_authenticated_user_can_show_activity_type()
+    public function test_authenticated_user_can_show_activity_type(): void
     {
+        /** @var ActivityType $type */
         $type = ActivityType::factory()->create();
 
         $response = $this->withHeaders($this->authHeaders())
@@ -63,8 +69,9 @@ class ActivityTypeControllerTest extends TestCase
                  ->assertJsonPath('data.id', $type->id);
     }
 
-    public function test_authenticated_user_can_update_activity_type()
+    public function test_authenticated_user_can_update_activity_type(): void
     {
+        /** @var ActivityType $type */
         $type = ActivityType::factory()->create([
             'name' => 'Ancien',
             'default_points_per_hour' => 2,
@@ -83,8 +90,9 @@ class ActivityTypeControllerTest extends TestCase
                  ->assertJsonPath('data.default_points_per_hour', 6);
     }
 
-    public function test_authenticated_user_can_delete_activity_type()
+    public function test_authenticated_user_can_delete_activity_type(): void
     {
+        /** @var ActivityType $type */
         $type = ActivityType::factory()->create();
 
         $response = $this->withHeaders($this->authHeaders())

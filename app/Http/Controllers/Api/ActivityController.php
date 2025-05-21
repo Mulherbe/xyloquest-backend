@@ -9,23 +9,23 @@ use App\Http\Resources\ActivityResource;
 use App\Models\Activity;
 use App\Models\ActivityType;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ActivityController extends Controller
 {
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
         return ActivityResource::collection(
             Activity::with(['activityType', 'user'])->get()
         );
     }
 
-    public function store(StoreActivityRequest $request)
+    public function store(StoreActivityRequest $request): ActivityResource
     {
         $data = $request->validated();
 
-        if (!isset($data['status'])) {
-            $data['status'] = 'pending';
-        }
+        $data['status'] = $data['status'] ?? 'pending';
 
         $data['earned_points'] = $this->calculatePoints(
             $data['start_date'],
@@ -33,32 +33,33 @@ class ActivityController extends Controller
             $data['activity_type_id']
         );
 
-        $activity = Activity::create($data);
+        /** @var Activity $activity */
+        $activity = Activity::query()->create($data);
 
         return new ActivityResource(
             $activity->load(['activityType', 'user'])
         );
     }
 
-    public function show(Activity $activity)
+    public function show(Activity $activity): ActivityResource
     {
         return new ActivityResource(
             $activity->load(['activityType', 'user'])
         );
     }
 
-    public function update(UpdateActivityRequest $request, Activity $activity)
+    public function update(UpdateActivityRequest $request, Activity $activity): ActivityResource
     {
         $data = $request->validated();
 
         $start = $data['start_date'] ?? $activity->start_date;
         $end = $data['end_date'] ?? $activity->end_date;
-        $activityTypeId = $data['activity_type_id'] ?? $activity->activity_type_id;
+        $typeId = $data['activity_type_id'] ?? $activity->activity_type_id;
 
         $data['earned_points'] = $this->calculatePoints(
             $start,
             $end,
-            $activityTypeId
+            $typeId
         );
 
         $activity->update($data);
@@ -68,7 +69,7 @@ class ActivityController extends Controller
         );
     }
 
-    public function destroy(Activity $activity)
+    public function destroy(Activity $activity): JsonResponse
     {
         $userId = $activity->user_id;
         $year = Carbon::parse($activity->start_date)->year;
@@ -76,7 +77,8 @@ class ActivityController extends Controller
 
         $activity->delete();
 
-        $updatedPoints = Activity::where('user_id', $userId)
+        $updatedPoints = Activity::query()
+            ->where('user_id', $userId)
             ->whereYear('start_date', $year)
             ->whereMonth('start_date', $month)
             ->sum('earned_points');
@@ -87,18 +89,17 @@ class ActivityController extends Controller
         ]);
     }
 
-private function calculatePoints(string $startDate, string $endDate, int $activityTypeId): int
-{
-    $start = Carbon::parse($startDate);
-    $end = Carbon::parse($endDate);
+    private function calculatePoints(string $startDate, string $endDate, int $activityTypeId): int
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
 
-    // Important : calcule la différence dans le bon sens
-    $durationInMinutes = $start->diffInMinutes($end); // ✅ pas besoin de 'false'
-    $durationInHours = $durationInMinutes / 60;
-    $pointsPerHour = ActivityType::find($activityTypeId)?->default_points_per_hour ?? 0;
+        $durationInMinutes = $start->diffInMinutes($end);
+        $durationInHours = $durationInMinutes / 60;
 
-    return round($durationInHours * $pointsPerHour);
-}
+        $type = ActivityType::query()->find($activityTypeId);
+        $pointsPerHour = $type ? $type->default_points_per_hour : 0;
 
-
+        return (int) round($durationInHours * $pointsPerHour);
+    }
 }

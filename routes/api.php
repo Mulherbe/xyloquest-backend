@@ -1,12 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ActivityController;
 use App\Http\Controllers\Api\ActivityTypeController;
-use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\LogController;
 use App\Http\Controllers\Api\MonthlyGoalController;
+use Illuminate\Support\Facades\Route;
 
 // 🟢 Auth public (login)
 Route::post('/login', [AuthController::class, 'login']);
@@ -22,4 +21,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/activity-types', ActivityTypeController::class);
     Route::apiResource('monthly-goals', MonthlyGoalController::class);
     Route::apiResource('/logs', LogController::class);
+    Route::get('/summary', [MonthlyGoalController::class, 'summary']);
+
 });

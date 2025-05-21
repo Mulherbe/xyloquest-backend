@@ -4,10 +4,12 @@ namespace Tests\Feature;
 
 use App\Models\MonthlyGoal;
 use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class MonthlyGoalControllerTest extends TestCase
 {
+    use RefreshDatabase;
 
     protected User $user;
     protected string $token;
@@ -16,8 +18,11 @@ class MonthlyGoalControllerTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = User::factory()->create();
-        $this->token = $this->user->createToken('test')->plainTextToken;
+        /** @var User $user */
+        $user = User::factory()->create();
+
+        $this->user = $user;
+        $this->token = $user->createToken('test')->plainTextToken;
     }
 
     protected function authHeaders(): array
@@ -25,9 +30,10 @@ class MonthlyGoalControllerTest extends TestCase
         return ['Authorization' => "Bearer {$this->token}"];
     }
 
-    public function test_can_list_monthly_goals()
+    public function test_can_list_monthly_goals(): void
     {
-        MonthlyGoal::factory()->create(['user_id' => $this->user->id]);
+        /** @var MonthlyGoal $goal */
+        $goal = MonthlyGoal::factory()->create(['user_id' => $this->user->id]);
 
         $response = $this->withHeaders($this->authHeaders())
                          ->getJson('/api/monthly-goals');
@@ -36,7 +42,7 @@ class MonthlyGoalControllerTest extends TestCase
                  ->assertJsonStructure(['data']);
     }
 
-    public function test_can_create_or_update_monthly_goal()
+    public function test_can_create_or_update_monthly_goal(): void
     {
         $payload = [
             'user_id' => $this->user->id,
@@ -44,7 +50,6 @@ class MonthlyGoalControllerTest extends TestCase
             'month' => 5,
             'goal_points' => 100,
         ];
-
         $response = $this->withHeaders($this->authHeaders())
                          ->postJson('/api/monthly-goals', $payload);
 
@@ -53,11 +58,10 @@ class MonthlyGoalControllerTest extends TestCase
                  ->assertJsonPath('data.goal_points', 100);
     }
 
-    public function test_can_show_monthly_goal()
+    public function test_can_show_monthly_goal(): void
     {
-        $goal = MonthlyGoal::factory()->create([
-            'user_id' => $this->user->id,
-        ]);
+        /** @var MonthlyGoal $goal */
+        $goal = MonthlyGoal::factory()->create(['user_id' => $this->user->id]);
 
         $response = $this->withHeaders($this->authHeaders())
                          ->getJson("/api/monthly-goals/{$goal->id}");
@@ -66,8 +70,9 @@ class MonthlyGoalControllerTest extends TestCase
                  ->assertJsonPath('data.id', $goal->id);
     }
 
-    public function test_can_update_monthly_goal()
+    public function test_can_update_monthly_goal(): void
     {
+        /** @var MonthlyGoal $goal */
         $goal = MonthlyGoal::factory()->create([
             'user_id' => $this->user->id,
             'goal_points' => 100,
@@ -84,11 +89,10 @@ class MonthlyGoalControllerTest extends TestCase
                  ->assertJsonPath('data.goal_points', 200);
     }
 
-    public function test_can_delete_monthly_goal()
+    public function test_can_delete_monthly_goal(): void
     {
-        $goal = MonthlyGoal::factory()->create([
-            'user_id' => $this->user->id,
-        ]);
+        /** @var MonthlyGoal $goal */
+        $goal = MonthlyGoal::factory()->create(['user_id' => $this->user->id]);
 
         $response = $this->withHeaders($this->authHeaders())
                          ->deleteJson("/api/monthly-goals/{$goal->id}");

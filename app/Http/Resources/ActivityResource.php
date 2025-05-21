@@ -4,6 +4,9 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @mixin \App\Models\Activity
+ */
 class ActivityResource extends JsonResource
 {
     public function toArray($request): array
@@ -26,10 +29,11 @@ class ActivityResource extends JsonResource
 
             // Relations
             'activity_type' => new ActivityTypeResource($this->whenLoaded('activityType')),
-            'user'            => [
-                'id'    => $this->user->id,
-                'name'  => $this->user->name,
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
                 'email' => $this->user->email,
-            ],        ];
+            ],
+        ];
     }
 }
