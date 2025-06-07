@@ -8,6 +8,7 @@ use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
+    use RefreshDatabase;
 
     public function test_user_can_login_with_correct_credentials()
     {

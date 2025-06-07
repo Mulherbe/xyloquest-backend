@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
             ActivitySeeder::class,
             LogSeeder::class,
             MonthlyGoalSeeder::class,
+            TaskStatusSeeder::class,
+
         ]);
     }
 
